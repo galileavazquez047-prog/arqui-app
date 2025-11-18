@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generador de Datagrama IPv4 - App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #e0c3fc 0%, #d5aaff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            width: 650px;
+            max-width: 95vw;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #b794f6 0%, #9b6dd7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #b794f6 0%, #d5aaff 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #374151;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        label::before {
+            content: "▸";
+            color: #b794f6;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            background: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #b794f6;
+            box-shadow: 0 0 0 4px rgba(183, 148, 246, 0.15);
+            transform: translateY(-1px);
+        }
+
+        input:hover, select:hover, textarea:hover {
+            border-color: #d5aaff;
+        }
+
+        input[readonly] {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #b794f6 0%, #d5aaff 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(183, 148, 246, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(183, 148, 246, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            color: #374151;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .resultado-container {
+            margin-top: 30px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .resultado-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .resultado-container h2 {
+            color: #374151;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .resultado-container h2::before {
+            content: "⬡";
+            color: #b794f6;
+            font-size: 24px;
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #b794f6 0%, #d5aaff 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(183, 148, 246, 0.3);
+        }
+
+        .btn-copy:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(183, 148, 246, 0.5);
+        }
+
+        #resultado {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            color: #1f2937;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            min-height: 60px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05);
+            line-height: 1.8;
+        }
+
+        #resultado:empty::before {
+            content: "El datagrama generado aparecerá aquí...";
+            color: #9ca3af;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+            animation: slideInRight 0.3s ease-out;
+            z-index: 1000;
+            display: none;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .resultado-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23b794f6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">
+        ✓ Datagrama copiado al portapapeles
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Generador de Datagrama IPv4</h1>
+            <span class="badge">Creado por: Galilea Vázquez Lira</span>
+        </div>
+
+        <form id="ipv4Form" onsubmit="return false;">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Versión</label>
+                    <input type="number" id="version" value="4" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Longitud del encabezado (5-15)</label>
+                    <input type="number" id="ihl" min="5" max="15" value="5" inputmode="numeric" pattern="[0-9]*" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Tipo de Servicio (TOS)</label>
+                    <select id="tos">
+                        <option value="00">Rutinario (0x00)</option>
+                        <option value="10">Minimizar Delay (0x10)</option>
+                        <option value="08">Maximizar Throughput (0x08)</option>
+                        <option value="04">Maximizar Reliability (0x04)</option>
+                        <option value="02">Minimizar Monetary Cost (0x02)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Identificación</label>
+                    <input type="text" id="identificacion" placeholder="12345 o ABCD" inputmode="text" pattern="[0-9A-Fa-f]*" />
+                    <span class="info-text">Hex o decimal</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Flags (0-7)</label>
+                    <input type="text" id="flags" placeholder="0-7" inputmode="numeric" pattern="[0-7]" maxlength="1" />
+                </div>
+
+                <div class="form-group">
+                    <label>Fragmento Offset</label>
+                    <input type="text" id="fragmentOffset" placeholder="0" inputmode="numeric" pattern="[0-9]*" />
+                </div>
+
+                <div class="form-group">
+                    <label>TTL (Tiempo de Vida)</label>
+                    <input type="number" id="ttl" value="64" inputmode="numeric" pattern="[0-9]*" min="0" max="255" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Protocolo</label>
+                    <select id="protocolo">
+                        <option value="1">ICMP (1)</option>
+                        <option value="6">TCP (6)</option>
+                        <option value="17">UDP (17)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>IP Fuente</label>
+                    <input type="text" id="ipFuente" placeholder="192.168.0.1" inputmode="decimal" pattern="[0-9.]*" />
+                </div>
+
+                <div class="form-group">
+                    <label>IP Destino</label>
+                    <input type="text" id="ipDestino" placeholder="192.168.0.2" inputmode="decimal" pattern="[0-9.]*" />
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Opciones (Hex sin 0x)</label>
+                    <input type="text" id="opciones" placeholder="010203" inputmode="text" pattern="[0-9A-Fa-f]*" />
+                    <span class="info-text">Opcional - formato hexadecimal</span>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Datos (mensaje)</label>
+                    <textarea id="datos" rows="4" placeholder="Escribe tu mensaje aquí..."></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="btnGenerar" class="btn-primary">🚀 Generar</button>
+                <button type="button" id="btnLimpiar" class="btn-secondary">🗑️ Limpiar</button>
+            </div>
+        </form>
+
+        <div class="resultado-container">
+            <div class="resultado-header">
+                <h2>Datagrama en Hexadecimal</h2>
+                <button id="btnCopiar" class="btn-copy" style="display: none;">📋 Copiar</button>
+            </div>
+            <pre id="resultado"></pre>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            window.soloNumeros = function (el) {
+                el.value = el.value.replace(/[^0-9]/g, '');
+            };
+
+            window.soloHex = function (el) {
+                el.value = el.value.replace(/[^0-9A-Fa-f]/g, '');
+            };
+
+            window.soloIP = function (el) {
+                el.value = el.value.replace(/[^0-9.]/g, '');
+            };
+
+            function parseFlexibleInt(txt) {
+                if (!txt) return 0;
+                txt = txt.trim();
+                if (/^0x/i.test(txt)) return parseInt(txt.substring(2), 16);
+                if (/^0b/i.test(txt)) return parseInt(txt.substring(2), 2);
+                if (/^[0-9A-Fa-f]+$/i.test(txt) && /[A-Fa-f]/.test(txt)) return parseInt(txt, 16);
+                return parseInt(txt, 10) || 0;
+            }
+
+            function ipv4ToBytes(ip) {
+                const p = ip.trim().split(".");
+                if (p.length !== 4) throw new Error("IP inválida - debe tener 4 octetos");
+                return p.map(n => {
+                    if (!/^[0-9]{1,3}$/.test(n)) throw new Error("IP solo acepta números");
+                    const v = parseInt(n, 10);
+                    if (isNaN(v) || v < 0 || v > 255)
+                        throw new Error("Octeto IP inválido: " + n + " (debe ser 0-255)");
+                    return v;
+                });
+            }
+
+            function hexStringToBytes(h) {
+                if (!h) return [];
+                const s = h.replace(/\s+/g, '');
+                if (s.length % 2 !== 0) throw new Error('Hex string debe tener longitud par');
+                const out = [];
+                for (let i = 0; i < s.length; i += 2) out.push(parseInt(s.substr(i, 2), 16) & 0xFF);
+                return out;
+            }
+
+            function computeIPChecksum(bytes) {
+                let sum = 0;
+                for (let i = 0; i < bytes.length; i += 2) {
+                    const hi = bytes[i] & 0xFF;
+                    const lo = (i + 1 < bytes.length) ? (bytes[i + 1] & 0xFF) : 0;
+                    sum += (hi << 8) | lo;
+                    while (sum > 0xFFFF) sum = (sum & 0xFFFF) + (sum >>> 16);
+                }
+                return (~sum) & 0xFFFF;
+            }
+
+            function showNotification(message) {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const ihlEl = document.getElementById('ihl');
+                const identificacionEl = document.getElementById('identificacion');
+                const flagsEl = document.getElementById('flags');
+                const fragEl = document.getElementById('fragmentOffset');
+                const ttlEl = document.getElementById('ttl');
+                const opcionesEl = document.getElementById('opciones');
+                const ipFuenteEl = document.getElementById('ipFuente');
+                const ipDestinoEl = document.getElementById('ipDestino');
+                const btn = document.getElementById('btnGenerar');
+                const btnLimpiar = document.getElementById('btnLimpiar');
+                const btnCopiar = document.getElementById('btnCopiar');
+
+                // Filtros de entrada
+                ihlEl.addEventListener('input', function () { 
+                    window.soloNumeros(this); 
+                    if (this.value) this.value = Math.max(5, Math.min(15, parseInt(this.value, 10) || 5)); 
+                });
+                
+                identificacionEl.addEventListener('input', function () { 
+                    window.soloHex(this); 
+                });
+                
+                flagsEl.addEventListener('input', function () { 
+                    window.soloNumeros(this); 
+                    if (this.value) this.value = Math.max(0, Math.min(7, parseInt(this.value,10)||0)); 
+                });
+                
+                fragEl.addEventListener('input', function () { 
+                    window.soloNumeros(this); 
+                });
+                
+                ttlEl.addEventListener('input', function () { 
+                    window.soloNumeros(this); 
+                    if (this.value) this.value = Math.max(0, Math.min(255, parseInt(this.value,10)||64)); 
+                });
+                
+                opcionesEl.addEventListener('input', function () { 
+                    window.soloHex(this); 
+                });
+
+                ipFuenteEl.addEventListener('input', function () { 
+                    window.soloIP(this); 
+                });
+                
+                ipDestinoEl.addEventListener('input', function () { 
+                    window.soloIP(this); 
+                });
+
+                // Botón Generar
+                btn.addEventListener('click', function () {
+                    try {
+                        const version = 4;
+                        const ihl = parseInt(ihlEl.value, 10) || 5;
+                        const tos = parseInt(document.getElementById('tos').value, 16) || 0;
+                        const identificacion = parseFlexibleInt(identificacionEl.value) & 0xFFFF;
+                        const flags = parseInt(flagsEl.value, 10) & 0x7 || 0;
+                        const fragOffset = parseInt(fragEl.value, 10) & 0x1FFF || 0;
+                        const ttl = parseInt(ttlEl.value, 10) & 0xFF || 64;
+                        const protocolo = parseInt(document.getElementById('protocolo').value, 10) & 0xFF;
+                        const src = ipFuenteEl.value.trim();
+                        const dst = ipDestinoEl.value.trim();
+                        const opcionesHex = opcionesEl.value.trim();
+                        const datosTxt = document.getElementById('datos').value || '';
+
+                        const headerBytes = ihl * 4;
+                        const dataBytes = new TextEncoder().encode(datosTxt).length;
+                        const totalLength = headerBytes + dataBytes;
+
+                        const srcBytes = ipv4ToBytes(src);
+                        const dstBytes = ipv4ToBytes(dst);
+
+                        const optionsBytes = hexStringToBytes(opcionesHex);
+                        const expectedOptionsLen = headerBytes - 20;
+                        if (optionsBytes.length !== expectedOptionsLen) {
+                            if (expectedOptionsLen === 0 && optionsBytes.length === 0) {
+                                // ok
+                            } else {
+                                throw new Error(`Se espera ${expectedOptionsLen} bytes de opciones para IHL=${ihl}, pero se recibieron ${optionsBytes.length}`);
+                            }
+                        }
+
+                        const header = new Uint8Array(headerBytes);
+                        header[0] = (version << 4) | (ihl & 0x0F);
+                        header[1] = tos & 0xFF;
+                        header[2] = (totalLength >> 8) & 0xFF;
+                        header[3] = totalLength & 0xFF;
+                        header[4] = (identificacion >> 8) & 0xFF;
+                        header[5] = identificacion & 0xFF;
+                        const flagsAndOffset = ((flags & 0x7) << 13) | (fragOffset & 0x1FFF);
+                        header[6] = (flagsAndOffset >> 8) & 0xFF;
+                        header[7] = flagsAndOffset & 0xFF;
+                        header[8] = ttl & 0xFF;
+                        header[9] = protocolo & 0xFF;
+                        header[10] = 0;
+                        header[11] = 0;
+                        header.set(srcBytes, 12);
+                        header.set(dstBytes, 16);
+                        if (optionsBytes.length) header.set(optionsBytes, 20);
+
+                        const checksum = computeIPChecksum(header);
+                        header[10] = (checksum >> 8) & 0xFF;
+                        header[11] = checksum & 0xFF;
+
+                        const encoder = new TextEncoder();
+                        const dataBytesArr = encoder.encode(datosTxt);
+                        const datagram = new Uint8Array(header.length + dataBytesArr.length);
+                        datagram.set(header, 0);
+                        datagram.set(dataBytesArr, header.length);
+
+                        let hexOut = '';
+                        for (let i = 0; i < datagram.length; i++) {
+                            if (i % 16 === 0) hexOut += ('0000' + i.toString(16)).slice(-4) + ': ';
+                            hexOut += datagram[i].toString(16).padStart(2, '0').toUpperCase() + ' ';
+                            if ((i + 1) % 16 === 0) hexOut += '\n';
+                        }
+
+                        const resultado = document.getElementById('resultado');
+                        resultado.textContent = `Total bytes: ${datagram.length}\n\n` + hexOut;
+                        
+                        btnCopiar.style.display = 'block';
+                        showNotification('✓ Datagrama generado exitosamente');
+
+                    } catch (err) {
+                        alert('❌ Error: ' + err.message);
+                    }
+                });
+
+                // Botón Limpiar
+                btnLimpiar.addEventListener('click', function () {
+                    document.getElementById('ipv4Form').reset();
+                    document.getElementById('resultado').textContent = '';
+                    btnCopiar.style.display = 'none';
+                    ihlEl.value = 5;
+                    ttlEl.value = 64;
+                    showNotification('Formulario limpiado');
+                });
+
+                // Botón Copiar
+                btnCopiar.addEventListener('click', function () {
+                    const resultado = document.getElementById('resultado').textContent;
+                    navigator.clipboard.writeText(resultado).then(() => {
+                        showNotification(' Datagrama copiado al portapapeles');
+                    }).catch(() => {
+                        alert('No se pudo copiar al portapapeles');
+                    });
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
